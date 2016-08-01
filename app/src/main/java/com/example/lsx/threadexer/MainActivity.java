@@ -24,7 +24,15 @@ public class MainActivity extends AppCompatActivity {
     private  Handler mHandler= new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(Message msg) {
-            mProgressBar.setVisibility(View.VISIBLE);
+            switch(msg.what){
+                case 0:
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    break;
+                case 1:
+                    mProgressBar.setProgress((int)msg.obj);
+                    break;
+            }
+
         }
     };
 
@@ -45,7 +53,25 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 Message msg = new Message();
+                                //表示让progressbar显示出来
+                                msg.what = 0;
                                 mHandler.sendMessage(msg);
+                                for (int i =1; i<11;i++){
+                                    sleep();
+                                    Message msg2 = new Message();
+                                    //表示让progressbar往前走
+                                    msg2.what = 1;
+                                    msg2.obj = i*10;
+                                    mHandler.sendMessage(msg2);
+                                }
+                            }
+
+                            private void sleep() {
+                                try{
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                 ).start();
