@@ -31,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
                 case 1:
                     mProgressBar.setProgress((int)msg.obj);
                     break;
+                case 2:
+                    mImageView.setImageBitmap((Bitmap) msg.obj);
+                    mProgressBar.setVisibility(View.INVISIBLE);
             }
 
         }
@@ -52,18 +55,27 @@ public class MainActivity extends AppCompatActivity {
                         new Runnable() {
                             @Override
                             public void run() {
-                                Message msg = new Message();
+                                //Message不用每次都进行new，可以从已有的获取
+                                Message msg = mHandler.obtainMessage();
                                 //表示让progressbar显示出来
                                 msg.what = 0;
                                 mHandler.sendMessage(msg);
                                 for (int i =1; i<11;i++){
                                     sleep();
-                                    Message msg2 = new Message();
+                                    Message msg2 = mHandler.obtainMessage();
                                     //表示让progressbar往前走
                                     msg2.what = 1;
                                     msg2.obj = i*10;
                                     mHandler.sendMessage(msg2);
                                 }
+                                Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+                                        R.drawable.ic_launcher);
+                                Message msgBitmap = mHandler.obtainMessage();
+                                msgBitmap.what = 2;
+                                msgBitmap.obj = bitmap;
+                                mHandler.sendMessage(msgBitmap);
+
+
                             }
 
                             private void sleep() {
