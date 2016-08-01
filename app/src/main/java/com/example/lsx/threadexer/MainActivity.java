@@ -3,6 +3,9 @@ package com.example.lsx.threadexer;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +21,12 @@ public class MainActivity extends AppCompatActivity {
     private Button mLoadImageButton;
     private Button mShowToastButton;
     private ProgressBar mProgressBar;
+    private  Handler mHandler= new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +40,15 @@ public class MainActivity extends AppCompatActivity {
         mLoadImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new LoadImageTask().execute();
+                new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                Message msg = new Message();
+                                mHandler.sendMessage(msg);
+                            }
+                        }
+                ).start();
             }
         });
         mShowToastButton.setOnClickListener(new View.OnClickListener() {
@@ -42,44 +59,44 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    class LoadImageTask extends AsyncTask<Void,Integer,Bitmap>{
-        @Override
-        protected void onPreExecute() {
-            mProgressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Bitmap doInBackground(Void... params) {
-            for (int i =1; i<11; i++){
-                sleep();
-                publishProgress(i*10);
-            }
-
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-            Log.d(TAG, "线程doInBackground: "+Thread.currentThread().getName());
-            return bitmap;
-        }
-
-        private void sleep() {
-            try{
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            mImageView.setImageBitmap(bitmap);
-            mProgressBar.setVisibility(View.INVISIBLE);
-            Log.d(TAG, "线程onPostExecute: "+Thread.currentThread().getName());
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            mProgressBar.setProgress(values[0]);
-        }
-    }
+//    class LoadImageTask extends AsyncTask<Void,Integer,Bitmap>{
+//        @Override
+//        protected void onPreExecute() {
+//            mProgressBar.setVisibility(View.VISIBLE);
+//        }
+//
+//        @Override
+//        protected Bitmap doInBackground(Void... params) {
+//            for (int i =1; i<11; i++){
+//                sleep();
+//                publishProgress(i*10);
+//            }
+//
+//            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+//            Log.d(TAG, "线程doInBackground: "+Thread.currentThread().getName());
+//            return bitmap;
+//        }
+//
+//        private void sleep() {
+//            try{
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Bitmap bitmap) {
+//            mImageView.setImageBitmap(bitmap);
+//            mProgressBar.setVisibility(View.INVISIBLE);
+//            Log.d(TAG, "线程onPostExecute: "+Thread.currentThread().getName());
+//        }
+//
+//        @Override
+//        protected void onProgressUpdate(Integer... values) {
+//            mProgressBar.setProgress(values[0]);
+//        }
+//    }
 
 
 }
